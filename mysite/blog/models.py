@@ -3,6 +3,14 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
+class PublishedManager(models.Manager): # прикладной менеджер запросов
+    def get_queryset(self):
+        """
+        :return: QuerySet, отфильтрованный по значению PB
+        """
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
+
+
 class Post(models.Model):
     """
     Модель поста
@@ -35,6 +43,8 @@ class Post(models.Model):
     status = models.CharField(max_length=2,
                               choices=Status.choices, # вложенный класс
                               default=Status.DRAFT)
+    objects = models.Manager() # менеджер по умолчанию
+    published = PublishedManager() # конкретно-прикладной менеджер
 
     class Meta:
         # чтобы выдача по умолчанию была от более свежего к более старому посту
